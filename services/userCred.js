@@ -109,4 +109,31 @@ userCredRouter.post("/userDetails", async (req, res) => {
   }
 });
 
+// Route to handle adding package information
+userCredRouter.post("/addPackage", async (req, res) => {
+  try {
+    const { email, packageName, packageDetails } = req.body;
+    const db = client.db(dbName);
+    const usersCollection = db.collection("users");
+
+    // Check if the user exists
+    const existingUser = await usersCollection.findOne({ email });
+    if (!existingUser) {
+      return res.status(404).send("User not found");
+    }
+
+    // Update user document with package information
+    await usersCollection.updateOne(
+      { email },
+      { $set: { packageName, packageDetails } }
+    );
+
+    res.status(200).send("Package information added successfully");
+  } catch (error) {
+    console.error("Error adding package information:", error);
+    res.status(500).send("An error occurred while adding package information");
+  }
+});
+
+
 export { userCredRouter };
