@@ -54,7 +54,7 @@ userCredRouter.post("/Login", async (req, res) => {
 }); //
 // Route to handle user registration
 userCredRouter.post("/register", async (req, res) => {
-  const { firstName, lastName, email, password, role } = req.body;
+  const { firstName, lastName, email, password, role, packages } = req.body;
 
   // Simple validation
   if (!firstName || !lastName || !email || !password || !role) {
@@ -75,13 +75,14 @@ userCredRouter.post("/register", async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create a new user
+    // Create a new user object
     const newUser = {
       firstName,
       lastName,
       email,
       password: hashedPassword,
       role,
+      packages // Add packages to the user object
     };
 
     // Insert the new user into the database
@@ -93,6 +94,7 @@ userCredRouter.post("/register", async (req, res) => {
     res.status(500).send("An error occurred during registration");
   }
 });
+
 
 userCredRouter.post("/userDetails", async (req, res) => {
   const { email } = req.body;
