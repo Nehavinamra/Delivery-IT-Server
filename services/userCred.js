@@ -54,7 +54,7 @@ userCredRouter.post("/Login", async (req, res) => {
 }); //
 // Route to handle user registration
 userCredRouter.post("/register", async (req, res) => {
-  const { firstName, lastName, email, password, role, packages } = req.body;
+  const { firstName, lastName, email, password, role, packages, chatSchema} = req.body;
 
   // Simple validation
   if (!firstName || !lastName || !email || !password || !role) {
@@ -74,7 +74,18 @@ userCredRouter.post("/register", async (req, res) => {
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-
+// Define the MongoDB schema for chat messages
+const chatSchema = {
+  conversationId: String,
+  messages: [
+    {
+      from: String,
+      to: String,
+      content: String,
+      timestamp: Date,
+    },
+  ],
+};
     // Create a new user object
     const newUser = {
       firstName,
@@ -82,7 +93,8 @@ userCredRouter.post("/register", async (req, res) => {
       email,
       password: hashedPassword,
       role,
-      packages // Add packages to the user object
+      packages,
+      chat: chatSchema// add the chatSchema to the chat property
     };
 
     // Insert the new user into the database
@@ -136,6 +148,53 @@ userCredRouter.post("/addPackage", async (req, res) => {
     res.status(500).send("An error occurred while adding package information");
   }
 });
+
+// Route to handle sending chat messages
+userCredRouter.post("/sendMessage", async (req, res) => {
+  const { conversationId, from, to, content } = req.body;
+  try {
+    const db = client.db(dbName);
+    const chatCollection = db.collection("chat");
+
+    // Find the conversation document or create a new one if it doesn't exist
+    const conversation = await chatCollection.findOneAndUpdate(
+      { conversationId },
+      {
+        $addToSet: {
+          messages: { from, to, content, timestamp: new Date() },
+        },
+      },
+      { upsert: true, returnDocument: "after" }
+    );
+
+    res.status(201).json({ message: "Message sent successfully", conversation });
+  } catch (error) {
+    console.error("Error sending message:", error);
+    res.status(500).send("An error occurred while sending message");
+  }
+});
+
+// Route to handle retrieving chat messages for a specific conversation
+userCredRouter.post("/getMessages", async (req, res) => {
+  const { conversationId } = req.body;
+  try {
+    const db = client.db(dbName);
+    const chatCollection = db.collection("chat");
+
+    // Retrieve messages for the specified conversation
+    const conversation = await chatCollection.findOne({ conversationId });
+
+    if (!conversation) {
+      return res.status(404).send("Conversation not found");
+    }
+
+    res.status(200).json({ messages: conversation.messages });
+  } catch (error) {
+    console.error("Error retrieving messages:", error);
+    res.status(500).send("An error occurred while retrieving messages");
+  }
+});
+
 
 
 export { userCredRouter };
