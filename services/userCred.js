@@ -52,9 +52,20 @@ userCredRouter.post("/Login", async (req, res) => {
   }
   // No need to close the MongoDB client after every request
 }); //
+
+// Example structure of a chat object
+const chatObject = {
+  timestamp: new Date(), // Time data
+  messages: [], // Array to store chat messages
+  participants: [], // Array to store participants
+  chatList: [],
+
+  // Add more properties as needed
+};
+
 // Route to handle user registration
 userCredRouter.post("/register", async (req, res) => {
-  const { firstName, lastName, email, password, role, packages, chatSchema} = req.body;
+  const { firstName, lastName, email, password, role, packages, chat} = req.body;
 
   // Simple validation
   if (!firstName || !lastName || !email || !password || !role) {
@@ -74,18 +85,7 @@ userCredRouter.post("/register", async (req, res) => {
     // Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-// Define the MongoDB schema for chat messages
-const chatSchema = {
-  conversationId: String,
-  messages: [
-    {
-      from: String,
-      to: String,
-      content: String,
-      timestamp: Date,
-    },
-  ],
-};
+
     // Create a new user object
     const newUser = {
       firstName,
@@ -94,7 +94,7 @@ const chatSchema = {
       password: hashedPassword,
       role,
       packages,
-      chat: chatSchema// add the chatSchema to the chat property
+      chat: [chatObject] // Initialize chat array with a chat object
     };
 
     // Insert the new user into the database
@@ -148,52 +148,39 @@ userCredRouter.post("/addPackage", async (req, res) => {
     res.status(500).send("An error occurred while adding package information");
   }
 });
-
-// Route to handle sending chat messages
-userCredRouter.post("/sendMessage", async (req, res) => {
-  const { conversationId, from, to, content } = req.body;
+// Route to add a new chat
+userCredRouter.post("/addChat", async (req, res) => {
   try {
+    const { email, message, participant } = req.body;
     const db = client.db(dbName);
-    const chatCollection = db.collection("chat");
+    const usersCollection = db.collection("users");
 
-    // Find the conversation document or create a new one if it doesn't exist
-    const conversation = await chatCollection.findOneAndUpdate(
-      { conversationId },
-      {
-        $addToSet: {
-          messages: { from, to, content, timestamp: new Date() },
-        },
-      },
-      { upsert: true, returnDocument: "after" }
-    );
-
-    res.status(201).json({ message: "Message sent successfully", conversation });
-  } catch (error) {
-    console.error("Error sending message:", error);
-    res.status(500).send("An error occurred while sending message");
-  }
-});
-
-// Route to handle retrieving chat messages for a specific conversation
-userCredRouter.post("/getMessages", async (req, res) => {
-  const { conversationId } = req.body;
-  try {
-    const db = client.db(dbName);
-    const chatCollection = db.collection("chat");
-
-    // Retrieve messages for the specified conversation
-    const conversation = await chatCollection.findOne({ conversationId });
-
-    if (!conversation) {
-      return res.status(404).send("Conversation not found");
+    // Check if the user exists
+    const existingUser = await usersCollection.findOne({ email });
+    if (!existingUser) {
+      return res.status(404).send("User not found");
     }
 
-    res.status(200).json({ messages: conversation.messages });
+    // Construct a new chat object
+    const newChat = {
+      timestamp: new Date(),
+      messages: [{ message, sender: email }], // Example structure for messages
+      participants: [participant] // Example structure for participants
+    };
+
+    // Add new chat to the user's chat array
+    await usersCollection.updateOne(
+      { email },
+      { $push: { chat: newChat } }
+    );
+
+    res.status(200).send("Chat added successfully");
   } catch (error) {
-    console.error("Error retrieving messages:", error);
-    res.status(500).send("An error occurred while retrieving messages");
+    console.error("Error adding chat:", error);
+    res.status(500).send("An error occurred while adding chat");
   }
 });
+
 
 
 
