@@ -150,29 +150,30 @@ userCredRouter.post("/addPackage", async (req, res) => {
 });
 // Route to add a new chat
 // Route to add a new chat
+// Route to add a new chat
 userCredRouter.post("/addChat", async (req, res) => {
   try {
-    const { email, message, participant } = req.body;
+    const { participants, chatInfo, chatData } = req.body;
     const db = client.db(dbName);
     const usersCollection = db.collection("users");
 
-    // Check if the user exists
-    const existingUser = await usersCollection.findOne({ email });
-    if (!existingUser) {
-      return res.status(404).send("User not found");
+    // Check if the participants exist
+    const existingParticipants = await usersCollection.find({ email: { $in: participants } }).toArray();
+    if (!existingParticipants || existingParticipants.length !== participants.length) {
+      return res.status(404).send("Participants not found");
     }
 
-    // Construct a new chat object
-    const newChat = {
+    // Construct the chat object
+    const newChatObject = {
       timestamp: new Date(),
-      messages: [{ message, sender: email }], // Example structure for messages
-      participants: [email, participant] // Modified to include email and participant
+      chatInfo,
+      chatData
     };
 
-    // Add new chat to the user's chat array
-    await usersCollection.updateOne(
-      { email },
-      { $push: { chat: newChat } }
+    // Update participants' documents with new chat
+    await usersCollection.updateMany(
+      { email: { $in: participants } },
+      { $push: { chat: newChatObject } }
     );
 
     res.status(200).send("Chat added successfully");
