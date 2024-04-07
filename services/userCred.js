@@ -149,6 +149,7 @@ userCredRouter.post("/addPackage", async (req, res) => {
   }
 });
 // Route to add a new chat
+// Route to add a new chat
 userCredRouter.post("/addChat", async (req, res) => {
   try {
     const { email, message, participant } = req.body;
@@ -165,7 +166,7 @@ userCredRouter.post("/addChat", async (req, res) => {
     const newChat = {
       timestamp: new Date(),
       messages: [{ message, sender: email }], // Example structure for messages
-      participants: [participant] // Example structure for participants
+      participants: [email, participant] // Modified to include email and participant
     };
 
     // Add new chat to the user's chat array
