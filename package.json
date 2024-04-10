@@ -16,6 +16,7 @@
     "dotenv": "^16.4.4",
     "express": "^4.19.2",
     "mongodb": "^6.3.0",
+    "mongoose": "^8.3.1",
     "react-native-maps": "^1.13.0",
     "react-scripts": "^5.0.1",
     "socket.io": "^4.7.5",

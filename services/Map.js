@@ -14,31 +14,53 @@ const io = new Server(server, {
     }
 });
 
-const pickupLocation = [39.1683, -86.5090]; // Hardcoded pickup location
-const destinationLocation = [39.1611, -86.5340]; // Hardcoded destination location
+const drivers = {
+    'driver1': { lat: 39.1653, lng: -86.5264, status: 'available' },
+    'driver2': { lat: 39.1713, lng: -86.5164, status: 'on delivery' },
+};
+
+const packages = [
+    {
+        id: 'package1',
+        origin: { lat: 39.1653, lng: -86.5264 },
+        destination: { lat: 39.1683, lng: -86.5080 },
+        status: 'In Transit',
+        assignedDriver: 'driver1'
+    },
+];
 
 io.on('connection', (socket) => {
     console.log('A user connected');
 
-    // Emit the pickup and destination locations once upon connection
-    socket.emit('locationData', {
-        pickupLocation: [39.1683, -86.5090],
-        destinationLocation: [39.1611, -86.5340],
-        pickupAddress: '123 Pickup St, City, State',
-        destinationAddress: '456 Destination Ave, City, State',
+    socket.on('register', ({ role, id }) => {
+        if (role === 'driver') {
+            socket.emit('driverLocation', drivers[id] || {});
+        } else if (role === 'manager') {
+            socket.join('managers');
+            socket.emit('allDriversLocations', drivers);
+            socket.emit('allPackages', packages);
+        }
     });
 
-    setInterval(() => {
-        const latOffset = (Math.random() - 0.5) * 0.01;
-        const lngOffset = (Math.random() - 0.5) * 0.01;
-        const currentPosition = [
-            39.1653 + latOffset,
-            -86.5264 + lngOffset,
-        ];
-        socket.emit('positionUpdate', currentPosition);
-    }, 5000);
+    socket.on('updateLocation', ({ id, lat, lng }) => {
+        if (drivers[id]) {
+            drivers[id].lat = lat;
+            drivers[id].lng = lng;
+            io.to('managers').emit('driverLocationUpdate', { id, lat, lng });
 
-    socket.on('disconnect', () => console.log('A user disconnected'));
+            packages.forEach(pkg => {
+                if (pkg.assignedDriver === id) {
+                    pkg.origin.lat = lat;
+                    pkg.origin.lng = lng;
+                    io.emit('packagePositionUpdate', { lat, lng });
+                }
+            });
+        }
+    });
+
+    socket.on('disconnect', () => {
+        console.log('A user disconnected');
+    });
 });
 
 const PORT = process.env.PORT || 8080;

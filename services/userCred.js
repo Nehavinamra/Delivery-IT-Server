@@ -23,12 +23,10 @@ userCredRouter.post("/Login", async (req, res) => {
   if (!email || !password) {
     return res.status(400).send("Request body must contain email and password");
   }
+
   try {
     const db = client.db(dbName);
     const usersCollection = db.collection("users");
-
-    //console.log(hello);
-    // Find the user by email
     const user = await usersCollection.findOne({ email });
     if (!user) {
       return res.status(404).send("User not found");
@@ -38,40 +36,28 @@ userCredRouter.post("/Login", async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).send("Password is incorrect");
+      return res.status(401).send("Invalid credentials");
     }
 
     // User is authenticated
     res.status(200).json({
-      message: "User Login Successful",
-      userInfo: JSON.stringify(user),
+      message: "Login successful",
+      userInfo: {
+        email: user.email,
+        role: user.role
+      }
     });
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).send("An error occurred during login");
   }
-  // No need to close the MongoDB client after every request
-}); //
-
-// Example structure of a chat object
-const chatObject = {
-  timestamp: new Date(), // Time data
-  messages: [], // Array to store chat messages
-  participants: [], // Array to store participants
-  chatList: [],
-
-  // Add more properties as needed
-};
-
+});
 // Route to handle user registration
 userCredRouter.post("/register", async (req, res) => {
-  const { firstName, lastName, email, password, role, packages, chat} = req.body;
-
-  // Simple validation
+  const { firstName, lastName, email, password, role } = req.body;
   if (!firstName || !lastName || !email || !password || !role) {
     return res.status(400).send("Please enter all fields");
   }
-
   try {
     const db = client.db(dbName);
     const usersCollection = db.collection("users");
@@ -79,7 +65,7 @@ userCredRouter.post("/register", async (req, res) => {
     // Check if the user already exists
     const existingUser = await usersCollection.findOne({ email });
     if (existingUser) {
-      return res.status(400).send("User already exists");
+      return res.status(409).send("Email already in use");
     }
 
     // Hash password
@@ -188,7 +174,7 @@ userCredRouter.post("/addChatUser", async (req, res) => {
   const {email} = req.body;
 
   // Simple validation
-  
+
 
   try {
     const db = client.db(dbName);
