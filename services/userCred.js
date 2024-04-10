@@ -184,6 +184,34 @@ userCredRouter.post("/addChat", async (req, res) => {
 });
 
 
+userCredRouter.post("/addChatUser", async (req, res) => {
+  const {email} = req.body;
 
+  // Simple validation
+  
+
+  try {
+    const db = client.db(dbName);
+    const usersCollection = db.collection("users/chat/chatObject/participants");
+
+    // Check if the user already exists
+    const existingUser = await usersCollection.findOne({ email });
+    if (existingUser) {
+      return res.status(400).send("User already exists");
+    }
+    // Hash password
+    // Create a new user object
+    const newUser = {
+
+    };
+    // Insert the new user into the database
+    await usersCollection.insertOne(newUser);
+
+    res.status(201).json({ message: "User registered successfully" });
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).send("An error occurred during registration");
+  }
+});
 
 export { userCredRouter };
