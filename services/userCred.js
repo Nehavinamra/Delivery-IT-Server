@@ -44,8 +44,10 @@ userCredRouter.post("/Login", async (req, res) => {
       message: "Login successful",
       userInfo: {
         email: user.email,
-        role: user.role
-      }
+        role: user.role,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -80,7 +82,7 @@ userCredRouter.post("/register", async (req, res) => {
       password: hashedPassword,
       role,
       packages,
-      chat: [chatObject] // Initialize chat array with a chat object
+      chat: [chatObject], // Initialize chat array with a chat object
     };
 
     // Insert the new user into the database
@@ -92,7 +94,6 @@ userCredRouter.post("/register", async (req, res) => {
     res.status(500).send("An error occurred during registration");
   }
 });
-
 
 userCredRouter.post("/userDetails", async (req, res) => {
   const { email } = req.body;
@@ -144,8 +145,13 @@ userCredRouter.post("/addChat", async (req, res) => {
     const usersCollection = db.collection("users");
 
     // Check if the participants exist
-    const existingParticipants = await usersCollection.find({ email: { $in: participants } }).toArray();
-    if (!existingParticipants || existingParticipants.length !== participants.length) {
+    const existingParticipants = await usersCollection
+      .find({ email: { $in: participants } })
+      .toArray();
+    if (
+      !existingParticipants ||
+      existingParticipants.length !== participants.length
+    ) {
       return res.status(404).send("Participants not found");
     }
 
@@ -153,7 +159,7 @@ userCredRouter.post("/addChat", async (req, res) => {
     const newChatObject = {
       timestamp: new Date(),
       chatInfo,
-      chatData
+      chatData,
     };
 
     // Update participants' documents with new chat
@@ -169,12 +175,10 @@ userCredRouter.post("/addChat", async (req, res) => {
   }
 });
 
-
 userCredRouter.post("/addChatUser", async (req, res) => {
-  const {email} = req.body;
+  const { email } = req.body;
 
   // Simple validation
-
 
   try {
     const db = client.db(dbName);
@@ -187,9 +191,7 @@ userCredRouter.post("/addChatUser", async (req, res) => {
     }
     // Hash password
     // Create a new user object
-    const newUser = {
-
-    };
+    const newUser = {};
     // Insert the new user into the database
     await usersCollection.insertOne(newUser);
 
