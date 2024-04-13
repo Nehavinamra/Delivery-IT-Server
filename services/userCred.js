@@ -17,7 +17,8 @@ const client = new MongoClient(process.env.DB_URI, {
     deprecationErrors: true,
   },
 });
-// Route to handle user login
+
+
 userCredRouter.post("/Login", async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -94,6 +95,7 @@ userCredRouter.post("/register", async (req, res) => {
     res.status(500).send("An error occurred during registration");
   }
 });
+
 
 userCredRouter.post("/userDetails", async (req, res) => {
   const { email } = req.body;
@@ -173,10 +175,12 @@ userCredRouter.post("/addChat", async (req, res) => {
   }
 });
 
+
 userCredRouter.post("/addChatUser", async (req, res) => {
-  const { email } = req.body;
+  const {email} = req.body;
 
   // Simple validation
+
 
   try {
     const db = client.db(dbName);

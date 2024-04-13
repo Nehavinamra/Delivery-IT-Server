@@ -4,14 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9fbce9f4-d592-4d6e-8380-f867c754e157" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/Search.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="9fbce9f4-d592-4d6e-8380-f867c754e157" name="Changes" comment="Search basics ( not functioning )&#10;Map Update ( functioning )&#10;Role Update ( functioning )">
+      <change afterPath="$PROJECT_DIR$/services/Chat.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/Map.js" beforeDir="false" afterPath="$PROJECT_DIR$/services/Map.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/services/userCred.js" beforeDir="false" afterPath="$PROJECT_DIR$/services/userCred.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -28,6 +25,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="REBASE" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -92,8 +90,19 @@
       <workItem from="1712423901823" duration="2526000" />
       <workItem from="1712438785882" duration="8192000" />
       <workItem from="1712536833269" duration="813000" />
-      <workItem from="1712784923280" duration="2380000" />
+      <workItem from="1712784923280" duration="3070000" />
+      <workItem from="1712880657286" duration="6601000" />
+      <workItem from="1713027159048" duration="421000" />
     </task>
+    <task id="LOCAL-00001" summary="Search basics ( not functioning )&#10;Map Update ( functioning )&#10;Role Update ( functioning )">
+      <option name="closed" value="true" />
+      <created>1712789629437</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1712789629437</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -109,5 +118,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Search basics ( not functioning )&#10;Map Update ( functioning )&#10;Role Update ( functioning )" />
+    <option name="LAST_COMMIT_MESSAGE" value="Search basics ( not functioning )&#10;Map Update ( functioning )&#10;Role Update ( functioning )" />
   </component>
 </project>
