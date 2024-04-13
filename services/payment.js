@@ -3,7 +3,8 @@ const paymentRouter = express.Router();
 
 paymentRouter.use(express.json());
 
-const stripe = require("stripe")("sk_test_4eC39HqLyjWDarjtT1zdp7dc");
+import Stripe from "stripe";
+const stripe = Stripe("sk_test_4eC39HqLyjWDarjtT1zdp7dc");
 
 const calculateOrderAmount = (items) => {
   return 1400;
