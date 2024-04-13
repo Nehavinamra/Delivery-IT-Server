@@ -135,9 +135,7 @@ userCredRouter.post("/addPackage", async (req, res) => {
     res.status(500).send("An error occurred while adding package information");
   }
 });
-// Route to add a new chat
-// Route to add a new chat
-// Route to add a new chat
+
 userCredRouter.post("/addChat", async (req, res) => {
   try {
     const { participants, chatInfo, chatData } = req.body;
