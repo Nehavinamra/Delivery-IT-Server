@@ -5,6 +5,7 @@ import { userCredRouter } from "./services/userCred.js";
 import router from "./services/Search.js";
 import { config } from "dotenv";
 import { paymentRouter } from "./services/payment.js";
+import employeeRouter from "./services/Search.js";
 config();
 const app = express();
 const port = process.env.PORT || 8080;
@@ -24,6 +25,7 @@ app.use(
 app.use(express.json());
 app.use(userCredRouter);
 app.use(paymentRouter);
+app.use(employeeRouter);
 
 async function main() {
   try {
