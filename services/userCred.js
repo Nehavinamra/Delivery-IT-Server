@@ -82,7 +82,7 @@ userCredRouter.post("/register", async (req, res) => {
       password: hashedPassword,
       role,
       packages: [],
-      chat: [chatObject], // Initialize chat array with a chat object
+      chat: [], // Initialize chat array with a chat object
     };
 
     // Insert the new user into the database
