@@ -81,7 +81,7 @@ userCredRouter.post("/register", async (req, res) => {
       email,
       password: hashedPassword,
       role,
-      packages: packages ?? [],
+      packages: [],
       chat: [chatObject], // Initialize chat array with a chat object
     };
 
