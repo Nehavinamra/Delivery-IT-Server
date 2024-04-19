@@ -4,16 +4,25 @@ import mongoose from "mongoose";
 import http from "http";
 import { userCredRouter } from "./services/userCred.js";
 import searchRouter from "./services/Search.js";
-import setupChat from './services/Chat.js';
-
-import router from "./services/Search.js";
 import { config } from "dotenv";
 import { paymentRouter } from "./services/payment.js";
 import employeeRouter from "./services/Search.js";
+import { Server  as SocketIO } from "socket.io";
+import { chatRouter } from "./services/chat.js";
+
+
+
 config();
 const app = express();
 const server = http.createServer(app);
-const port = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8080;
+const io = new SocketIO(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"],
+        credentials: true
+    }
+});
 // MongoDB Connection URL
 const mongoURI = process.env.MONGODB_URI || "mongodb+srv://nehaV:FV47KppuT6qWxcFz@cluster0.00tx6ph.mongodb.net/?retryWrites=true&w=majority";
 
@@ -40,19 +49,10 @@ app.use(express.json());
 app.use(userCredRouter);
 app.use(paymentRouter);
 app.use(employeeRouter);
-app.use('/api/users', userCredRouter);
 app.use('/api/search', searchRouter);
+app.use(chatRouter);
 
-setupChat(server);
 
-async function main() {
-  try {
-    app.listen(port, () => {
-      console.log(`Server listening on port ${port}`);
-    });
-  } catch (e) {
-    console.error("Server start error:", e);
-  }
-}
-
-main().catch(console.error);
+server.listen(PORT, () => {
+    console.log(`Server listening on http://localhost:${PORT}`);
+});

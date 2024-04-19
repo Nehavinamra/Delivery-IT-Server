@@ -1,39 +1,33 @@
-import { Server } from 'socket.io';
+import express from "express";
+const chatRouter = express.Router();
 
-export default function setupChat(server) {
-    const io = new Server(server, {
-        cors: {
-            origin: "*",
-        }
-    });
+const chatRooms = {};
 
-    let rooms = {};
 
-    io.on('connection', (socket) => {
-        console.log('New user connected');
+chatRouter.post("/createRoom", (req, res) => {
+    const { roomName } = req.body;
+    if (chatRooms[roomName]) {
+        return res.status(400).send("Room already exists");
+    }
+    chatRooms[roomName] = [];
+    res.status(201).send("Room created");
+});
 
-        socket.on('join', ({ userId, room }) => {
-            socket.join(room);
-            rooms[userId] = room;
-            console.log(`${userId} joined ${room}`);
-            socket.to(room).emit('user status', `${userId} has joined the chat`);
-        });
+chatRouter.post("/sendMessage", (req, res) => {
+    const { roomName, message } = req.body;
+    if (!chatRooms[roomName]) {
+        return res.status(404).send("Room not found");
+    }
+    chatRooms[roomName].push(message);
+    res.status(201).send("Message sent");
+});
 
-        socket.on('sendMessage', ({ userId, text }) => {
-            const room = rooms[userId];
-            io.to(room).emit('message', { userId, text });
-        });
+chatRouter.get("/getMessages", (req, res) => {
+    const { roomName } = req.query;
+    if (!chatRooms[roomName]) {
+        return res.status(404).send("Room not found");
+    }
+    res.status(200).json(chatRooms[roomName]);
+});
 
-        socket.on('createGroupChat', ({ managerId, employeeIds }) => {
-            const room = `manager_${managerId}_group`;
-            employeeIds.forEach(id => {
-                io.to(rooms[id]).socketsJoin(room);
-            });
-            rooms[managerId] = room;
-        });
-
-        socket.on('disconnect', () => {
-            console.log('User disconnected');
-        });
-    });
-}
+export { chatRouter };
