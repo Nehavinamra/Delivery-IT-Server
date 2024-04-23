@@ -7,6 +7,7 @@ import { config } from "dotenv";
 import { paymentRouter } from "./services/payment.js";
 import employeeRouter from "./services/Search.js";
 import { Server } from "socket.io";
+import { chatRoute } from "./services/Chat.js";
 
 config();
 const app = express();
@@ -42,14 +43,15 @@ chatServer.on("connection", (socket) => {
 });
 app.use(express.json());
 app.use(userCredRouter);
+app.use(chatRoute);
 app.use(paymentRouter);
 app.use(employeeRouter);
 app.use("/api/search", searchRouter);
 
 server.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
+  console.log(`Mongo Server listening on http://localhost:${PORT}`);
 });
 
 newChatServer.listen(chatPort, () => {
-  console.log(`Server listening on ${chatPort}`);
+  console.log(`Chat Server listening on ${chatPort}`);
 });
